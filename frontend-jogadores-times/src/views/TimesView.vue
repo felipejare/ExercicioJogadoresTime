@@ -1,8 +1,6 @@
-
-
 <script>
-import timeApi from "@/api/time.js";
-const timeApi = new TimesApi();
+import TimesApi from "@/api/times.js";
+const timesApi = new TimesApi();
 export default {
   data() {
     return {
@@ -16,14 +14,16 @@ export default {
   methods: {
     async salvar() {
       if (this.time.id) {
-        await timeApi.atualizarTime(this.time);
+        await timesApi.atualizarTime(this.time);
       } else {
-        await timeApi.adicionarTime(this.time);
+        await timesApi.adicionarTime(this.time);
       }
+      this.times = await timesApi.buscarTodosOsTimes();
+      this.time = {}; 
     },
     async excluir(time) {
-      await timeApi.excluirTime(time.id);
-      this.time = await timesApi.buscarTodosOsTime();
+      await timesApi.excluirTime(time.id);
+      this.times = await timesApi.buscarTodosOsTimes();
     },
     editar(time) {
       Object.assign(this.time, time);
@@ -41,7 +41,27 @@ export default {
     <input type="text" v-model="time.nome" @keyup.enter="salvar">
     <button @click="salvar">Adicionar</button>
   </div>
-  
+  <div class="list-items">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="time in times" :key="time.id">
+          <td>{{ time.id }}</td>
+          <td>{{ time.nome }}</td>
+          <td>
+            <button @click="editar(time)">Editar</button>
+            <button @click="excluir(time)">Excluir</button>
+          </td>        
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 </template>
 
